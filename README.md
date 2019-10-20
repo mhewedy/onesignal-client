@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mhewedy/onesignal-client.svg?branch=master)](https://travis-ci.org/mhewedy/onesignal-client)
+
 ### Usage
 
 1. Create file with name `playerids.txt` contains player IDs separated by new lines.
