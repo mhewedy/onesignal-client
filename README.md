@@ -6,3 +6,6 @@
 ```bash
 APP_ID=<onesignal api key> ./onesignal-client<.exe|.mac|.linux> | tee log.txt
 ```
+
+### Downloads:
+[Windows](https://github.com/mhewedy/onesignal-client/releases/download/v1.0/onesignal-client.exe)|[Mac](https://github.com/mhewedy/onesignal-client/releases/download/v1.0/onesignal-client.mac)|[Linux](https://github.com/mhewedy/onesignal-client/releases/download/v1.0/onesignal-client.linux)
