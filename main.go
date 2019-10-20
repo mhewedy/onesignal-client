@@ -17,6 +17,11 @@ import (
 type Tags map[string]interface{}
 type Body map[string]interface{}
 
+const (
+	ColorRed = "\033[0;31m"
+	NoColor  = "\033[0m"
+)
+
 func main() {
 
 	file, err := os.Open("playerids.txt")
@@ -31,7 +36,7 @@ func main() {
 		if playerID != "" {
 			err := SetAsApproved(playerID)
 			if err != nil {
-				fmt.Printf("playerID: %s failed with error: %s\n", playerID, err.Error())
+				fmt.Println(ColorRed, "playerID:", playerID, "failed with error: ", err.Error(), NoColor)
 			}
 			fmt.Println("-------------------------------------")
 		}
