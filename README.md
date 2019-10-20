@@ -4,5 +4,5 @@
 
 2. Issue the command:
 ```bash
-APP_ID=<onesignal api key> ./onesignal-client | tee log.txt
+APP_ID=<onesignal api key> ./onesignal-client<.exe|.mac|.linux> | tee log.txt
 ```
