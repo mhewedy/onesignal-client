@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -50,7 +49,7 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		if playerID := strings.TrimSpace(scanner.Text()); playerID != "" {
-			resp, err := SendTag(playerID, tags)
+			resp, err := SendTags(playerID, tags)
 			if err != nil {
 				printError(playerID, err)
 			} else {
@@ -65,7 +64,7 @@ func main() {
 	}
 }
 
-func SendTag(playerID string, tags Tags) (string, error) {
+func SendTags(playerID string, tags Tags) (string, error) {
 	body := Body{}
 	body["tags"] = tags
 	return NewRequest("PUT", "/players/"+playerID, body)
@@ -97,7 +96,7 @@ func NewRequest(method, subUrl string, body Body) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	b, err := ioutil.ReadAll(resp.Body.(io.Reader))
+	b, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -112,13 +111,13 @@ func NewRequest(method, subUrl string, body Body) (string, error) {
 
 func printSuccess(playerID, resp string) {
 	fmt.Print(ColorGreen)
-	fmt.Printf("playerID: %s success with response: %s\n", playerID, resp)
+	fmt.Printf("PlayerID: %s success with response: %s\n", playerID, resp)
 	fmt.Print(NoColor)
 }
 
 func printError(playerID string, err error) {
 	fmt.Print(ColorRed)
-	fmt.Printf("playerID: %s failed with error: %s\n", playerID, err.Error())
+	fmt.Printf("PlayerID: %s failed with error: %s\n", playerID, err.Error())
 	fmt.Print(NoColor)
 }
 
