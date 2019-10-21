@@ -17,6 +17,14 @@ import (
 type Tags map[string]interface{}
 type Body map[string]interface{}
 
+func (tags *Tags) Parse(jsonStr string) error {
+	err := json.Unmarshal([]byte(jsonStr), tags)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 const (
 	ColorRed   = "\033[0;31m"
 	ColorGreen = "\033[0;32m"
@@ -24,6 +32,14 @@ const (
 )
 
 func main() {
+
+	checkArgs()
+
+	tags := Tags{}
+	err := tags.Parse(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	file, err := os.Open("playerids.txt")
 	if err != nil {
@@ -34,28 +50,19 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		if playerID := strings.TrimSpace(scanner.Text()); playerID != "" {
-			err := SetAsApproved(playerID)
+			resp, err := SendTag(playerID, tags)
 			if err != nil {
 				printError(playerID, err)
+			} else {
+				printSuccess(playerID, resp)
 			}
+			fmt.Println("------------------------------------")
 		}
-		fmt.Println("------------------------------------")
 	}
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func SetAsApproved(playerID string) error {
-	resp, err := SendTag(playerID, Tags{
-		"isApproved": true,
-	})
-	if err != nil {
-		return err
-	}
-	printSuccess(playerID, resp)
-	return nil
 }
 
 func SendTag(playerID string, tags Tags) (string, error) {
@@ -113,4 +120,11 @@ func printError(playerID string, err error) {
 	fmt.Print(ColorRed)
 	fmt.Printf("playerID: %s failed with error: %s\n", playerID, err.Error())
 	fmt.Print(NoColor)
+}
+
+func checkArgs() {
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: ", os.Args[0], "<json tag>")
+		os.Exit(-1)
+	}
 }
