@@ -13,6 +13,12 @@ import (
 	"strings"
 )
 
+const (
+	ColorRed   = "\033[0;31m"
+	ColorGreen = "\033[0;32m"
+	ColorNone  = "\033[0m"
+)
+
 type Tags map[string]interface{}
 type Body map[string]interface{}
 
@@ -23,12 +29,6 @@ func (tags *Tags) Parse(jsonStr string) error {
 	}
 	return nil
 }
-
-const (
-	ColorRed   = "\033[0;31m"
-	ColorGreen = "\033[0;32m"
-	ColorNone  = "\033[0m"
-)
 
 func main() {
 
