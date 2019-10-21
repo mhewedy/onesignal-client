@@ -50,7 +50,7 @@ func main() {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		if playerID := strings.TrimSpace(scanner.Text()); playerID != "" {
-			resp, err := SendTag(playerID, tags)
+			resp, err := SendTags(playerID, tags)
 			if err != nil {
 				printError(playerID, err)
 			} else {
@@ -65,7 +65,7 @@ func main() {
 	}
 }
 
-func SendTag(playerID string, tags Tags) (string, error) {
+func SendTags(playerID string, tags Tags) (string, error) {
 	body := Body{}
 	body["tags"] = tags
 	return NewRequest("PUT", "/players/"+playerID, body)
