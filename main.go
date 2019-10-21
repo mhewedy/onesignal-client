@@ -27,7 +27,7 @@ func (tags *Tags) Parse(jsonStr string) error {
 const (
 	ColorRed   = "\033[0;31m"
 	ColorGreen = "\033[0;32m"
-	NoColor    = "\033[0m"
+	ColorNone  = "\033[0m"
 )
 
 func main() {
@@ -112,13 +112,13 @@ func NewRequest(method, subUrl string, body Body) (string, error) {
 func printSuccess(playerID, resp string) {
 	fmt.Print(ColorGreen)
 	fmt.Printf("PlayerID: %s success with response: %s\n", playerID, resp)
-	fmt.Print(NoColor)
+	fmt.Print(ColorNone)
 }
 
 func printError(playerID string, err error) {
 	fmt.Print(ColorRed)
 	fmt.Printf("PlayerID: %s failed with error: %s\n", playerID, err.Error())
-	fmt.Print(NoColor)
+	fmt.Print(ColorNone)
 }
 
 func checkArgs() {
