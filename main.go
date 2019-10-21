@@ -18,8 +18,9 @@ type Tags map[string]interface{}
 type Body map[string]interface{}
 
 const (
-	ColorRed = "\033[0;31m"
-	NoColor  = "\033[0m"
+	ColorRed   = "\033[0;31m"
+	ColorGreen = "\033[0;32m"
+	NoColor    = "\033[0m"
 )
 
 func main() {
@@ -32,14 +33,13 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		playerID := strings.TrimSpace(scanner.Text())
-		if playerID != "" {
+		if playerID := strings.TrimSpace(scanner.Text()); playerID != "" {
 			err := SetAsApproved(playerID)
 			if err != nil {
-				fmt.Println(ColorRed, "playerID:", playerID, "failed with error: ", err.Error(), NoColor)
+				printError(playerID, err)
 			}
-			fmt.Println("-------------------------------------")
 		}
+		fmt.Println("------------------------------------")
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -54,7 +54,7 @@ func SetAsApproved(playerID string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("playerID: %s success with response: %s\n", playerID, resp)
+	printSuccess(playerID, resp)
 	return nil
 }
 
@@ -66,14 +66,17 @@ func SendTag(playerID string, tags Tags) (string, error) {
 
 func NewRequest(method, subUrl string, body Body) (string, error) {
 
+	reqUrl := "https://onesignal.com/api/v1" + subUrl
+	fmt.Println("url: ", reqUrl)
+
 	body["app_id"] = os.Getenv("APP_ID")
 	jsonObj, err := json.Marshal(body)
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("request json: ", string(jsonObj))
 
-	fmt.Println("request json", string(jsonObj))
-	req, err := http.NewRequest(method, "https://onesignal.com/api/v1"+subUrl, bytes.NewBuffer(jsonObj))
+	req, err := http.NewRequest(method, reqUrl, bytes.NewBuffer(jsonObj))
 	if err != nil {
 		return "", err
 	}
@@ -98,4 +101,16 @@ func NewRequest(method, subUrl string, body Body) (string, error) {
 	}
 
 	return string(b), nil
+}
+
+func printSuccess(playerID, resp string) {
+	fmt.Print(ColorGreen)
+	fmt.Printf("playerID: %s success with response: %s\n", playerID, resp)
+	fmt.Print(NoColor)
+}
+
+func printError(playerID string, err error) {
+	fmt.Print(ColorRed)
+	fmt.Printf("playerID: %s failed with error: %s\n", playerID, err.Error())
+	fmt.Print(NoColor)
 }
