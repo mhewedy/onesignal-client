@@ -145,7 +145,8 @@ func printSummary(errorInfo []ErrorInfo, sCount int) error {
 	if len(errorInfo) == 0 {
 		_, _ = fmt.Fprintln(file, "All (", sCount, ") PlayerID succeed with no errors.")
 	} else {
-		_, _ = fmt.Fprintln(file, "We have (", sCount, ") PlayerIDs succeed and (", len(errorInfo), ") PlayerIDs Failed as follows:")
+		_, _ = fmt.Fprintln(file, "We have (", sCount, ") PlayerIDs succeed and",
+			"(", len(errorInfo), ") PlayerIDs Failed as follows:")
 		for key := range errorInfo {
 			_, _ = fmt.Fprintf(file, "PlayerID: %s failed with error: %s\n",
 				errorInfo[key].PlayerID, errorInfo[key].Error)
