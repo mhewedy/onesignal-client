@@ -3,6 +3,9 @@ language: go
 go:
   - 1.12.x
 
+before_script:
+  - GO111MODULE=off
+
 # before we deploy, we go build for all operating systems we would like to support
 before_deploy:
   - mkdir -p release
