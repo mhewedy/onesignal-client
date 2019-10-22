@@ -21,6 +21,6 @@ APP_ID=3e64a763-0557-4094-9bbb-345fded09cd9 ./onesignal-client.linux '{"isApprov
 see [onesignal docs](https://documentation.onesignal.com/reference#edit-device) for more about tags
 
 ### Downloads:
-[Windows](https://github.com/mhewedy/onesignal-client/releases/download/v4.0/onesignal-client.exe)
-|[Mac](https://github.com/mhewedy/onesignal-client/releases/download/v4.0/onesignal-client.mac)
-|[Linux](https://github.com/mhewedy/onesignal-client/releases/download/v4.0/onesignal-client.linux)
+[Windows](https://github.com/mhewedy/onesignal-client/releases/download/v5.0/onesignal-client.exe)
+|[Mac](https://github.com/mhewedy/onesignal-client/releases/download/v5.0/onesignal-client.mac)
+|[Linux](https://github.com/mhewedy/onesignal-client/releases/download/v5.0/onesignal-client.linux)
