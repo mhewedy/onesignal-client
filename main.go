@@ -6,21 +6,24 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/schollz/progressbar/v2"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
 )
 
-const (
-	ColorRed   = "\033[0;31m"
-	ColorGreen = "\033[0;32m"
-	ColorNone  = "\033[0m"
-)
+const playerIDCharLen = 36
 
 type Tags map[string]interface{}
 type Body map[string]interface{}
+
+type ErrorInfo struct {
+	PlayerID string
+	Error    string
+}
 
 func (tags *Tags) Parse(jsonStr string) error {
 	err := json.Unmarshal([]byte(jsonStr), tags)
@@ -34,6 +37,11 @@ func main() {
 
 	checkArgs()
 
+	errorInfo := make([]ErrorInfo, 0)
+	var sCount int
+
+	registerExitHook(&errorInfo, &sCount)
+
 	tags := Tags{}
 	err := tags.Parse(os.Args[1])
 	if err != nil {
@@ -46,17 +54,30 @@ func main() {
 	}
 	defer file.Close()
 
+	fileInfo, err := file.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+	bar := progressbar.New(int(fileInfo.Size() / playerIDCharLen))
+	_ = bar.RenderBlank()
+
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		if playerID := strings.TrimSpace(scanner.Text()); playerID != "" {
-			resp, err := SendTags(playerID, tags)
+			_, err := SendTags(playerID, tags)
 			if err != nil {
-				printError(playerID, err)
+				errorInfo = append(errorInfo, ErrorInfo{PlayerID: playerID, Error: err.Error()})
 			} else {
-				printSuccess(playerID, resp)
+				sCount++
 			}
-			fmt.Println("------------------------------------")
+			_ = bar.Add(1)
 		}
+	}
+	_ = bar.Finish()
+
+	err = printSummary(errorInfo, sCount)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -73,14 +94,12 @@ func SendTags(playerID string, tags Tags) (string, error) {
 func NewRequest(method, subUrl string, body Body) (string, error) {
 
 	reqUrl := "https://onesignal.com/api/v1" + subUrl
-	fmt.Println("url: ", reqUrl)
 
 	body["app_id"] = os.Getenv("APP_ID")
 	jsonObj, err := json.Marshal(body)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("request json: ", string(jsonObj))
 
 	req, err := http.NewRequest(method, reqUrl, bytes.NewBuffer(jsonObj))
 	if err != nil {
@@ -109,16 +128,40 @@ func NewRequest(method, subUrl string, body Body) (string, error) {
 	return string(b), nil
 }
 
-func printSuccess(playerID, resp string) {
-	fmt.Print(ColorGreen)
-	fmt.Printf("PlayerID: %s success with response: %s\n", playerID, resp)
-	fmt.Print(ColorNone)
+func printSummary(errorInfo []ErrorInfo, sCount int) error {
+
+	fmt.Println("\n\nSummary report has been written to \"summary.log\"")
+
+	file, err := os.OpenFile("summary.log", os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_ = file.Truncate(0)
+	_, _ = file.Seek(0, 0)
+	_, _ = fmt.Fprintln(file, "************ Summary Report ************")
+
+	if len(errorInfo) == 0 {
+		_, _ = fmt.Fprintln(file, "All (", sCount, ") PlayerID succeed with no errors.")
+	} else {
+		_, _ = fmt.Fprintln(file, "We have (", sCount, ") PlayerIDs succeed and (", len(errorInfo), ") PlayerIDs Failed as follows:")
+		for key := range errorInfo {
+			_, _ = fmt.Fprintf(file, "PlayerID: %s failed with error: %s\n",
+				errorInfo[key].PlayerID, errorInfo[key].Error)
+		}
+	}
+	return nil
 }
 
-func printError(playerID string, err error) {
-	fmt.Print(ColorRed)
-	fmt.Printf("PlayerID: %s failed with error: %s\n", playerID, err.Error())
-	fmt.Print(ColorNone)
+func registerExitHook(errorInfo *[]ErrorInfo, sCount *int) {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		<-c
+		_ = printSummary(*errorInfo, *sCount)
+		os.Exit(-1)
+	}()
 }
 
 func checkArgs() {
