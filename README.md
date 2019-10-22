@@ -18,9 +18,9 @@ example to run on linux:
 APP_ID=3e64a763-0557-4094-9bbb-345fded09cd9 ./onesignal-client.linux '{"isApproved": "", "isVerfied": true}'
 ```
 
-see [onesignal docs](https://documentation.onesignal.com/reference#edit-device) for more about tags
-
 <img src="https://github.com/mhewedy/onesignal-client/raw/master/screenshot.png" width="100%"  />
+
+see [onesignal docs](https://documentation.onesignal.com/reference#edit-device) for more about tags
 
 ### Downloads:
 [Windows](https://github.com/mhewedy/onesignal-client/releases/download/v5.0/onesignal-client.exe)
