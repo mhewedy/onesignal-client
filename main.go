@@ -167,7 +167,8 @@ func registerExitHook(errorInfo *[]ErrorInfo, sCount *int) {
 
 func checkArgs() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: ", os.Args[0], "<json tag>")
+		fmt.Println("Usage:", os.Args[0], "<json tag>")
+		fmt.Println("example:\nAPP_ID=myOneSignalAppId", os.Args[0], `'{"approved": true}'`)
 		os.Exit(-1)
 	}
 }
